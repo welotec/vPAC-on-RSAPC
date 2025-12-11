@@ -1,0 +1,18 @@
+---
+
+- hosts: all
+  become: true
+  tasks:
+
+  - name: Download SSC600
+    block:
+      - name: download cab archive
+        ansible.builtin.get_url:
+          url: "{{ ssc600_downloadlink }}"
+          dest: /root/virtual_products.cab
+      - name: extract archive
+        ansible.builtin.shell: cd /root && cabextract /root/virtual_products.cab
+      - name: check checksums
+        ansible.builtin.shell: cd /root/virtual_products && sha256sum -c checksums.sha256
+      - name: unzip disk image
+        ansible.builtin.shell: cd /root/virtual_products && gunzip -k ssc600_disk.img.gz

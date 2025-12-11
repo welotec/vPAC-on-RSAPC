@@ -1,0 +1,5 @@
+[NetDev]
+Name=mgmt-bridge
+Kind=bridge
+AlternativeName=lan_mgmt
+

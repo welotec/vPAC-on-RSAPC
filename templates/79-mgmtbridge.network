@@ -1,0 +1,11 @@
+#Ansible managed
+
+[Match]
+Name=mgmt-bridge
+
+[Network]
+Gateway=192.168.130.254
+Address={{ ansible_host }}/24
+Address=192.168.2.230/24
+DNS=192.168.130.254
+

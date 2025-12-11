@@ -1,0 +1,122 @@
+---
+
+- hosts: all
+  become: true
+  become_method: su
+  tasks:
+
+    - name: ensure a list of packages installed
+      ansible.builtin.apt:
+        state: present
+        update_cache: yes
+        pkg:
+          - msr-tools
+          - intel-cmt-cat
+          - linux-image-rt-amd64
+          - intel-microcode
+          - grub-efi-amd64-signed
+          - amd64-microcode
+          - cockpit
+          - cockpit-machines
+          - cockpit-packagekit
+          - cabextract
+          - apparmor-utils
+          - at
+          - audispd-plugins
+          - auditd
+          - bridge-utils
+          - btrfs-progs
+          - ca-certificates
+          - chrony
+          - cpuset
+          - curl
+          - docker-compose
+          - docker.io
+          - dstat
+          - efibootmgr
+          - gnupg
+          - iptables-persistent
+          - irqbalance
+          - jq
+          - lbzip2
+          - linuxptp
+          - lm-sensors
+          - lsb-release
+          - lvm2
+          - net-tools
+          #- netplan.io
+          - openssh-server
+          - ovmf
+          - parted
+          - python3-apt
+          - python3-cffi-backend
+          - python3-setuptools
+          - python3-lxml
+          - shim-signed
+          - sudo
+          - sysfsutils
+          - syslog-ng
+          - sysstat
+          - systemd-resolved
+          - tuned
+          - vim
+          - wget
+          - console-data
+          - ethtool
+          #- filebeat
+          - htop
+          - iotop
+          - iperf
+          - iperf3
+          - linux-cpupower
+          - lftp
+          #- metricbeat
+          - nmon
+          - rt-tests
+          - rtirq-init
+          - schedtool
+          - screen
+          - stress-ng
+          - sysfsutils
+          - tcpdump
+          - tshark
+          - tmux
+          #- busybox
+          - firmware-amd-graphics
+          - firmware-misc-nonfree
+          - firmware-linux-nonfree
+          - firmware-linux-free
+          - gunicorn
+          #- ipmitool
+          - libsnmp-extension-passpersist-perl
+          - libvirt-clients
+          - libvirt-daemon
+          - libvirt-daemon-driver-storage-rbd
+          - libvirt-daemon-system
+          - libxml2-utils
+          - linux-perf
+          - nginx
+          - ntfs-3g
+          #- openvswitch-switch
+          - patch
+          - python3-flaskext.wtf
+          - python3-pip
+          - python3-xmltodict
+          - qemu-block-extra
+          - qemu-system-x86
+          - qemu-utils
+          - snmpd
+          - virtinst
+
+    - name: ensure a list of packages isn't installed
+      ansible.builtin.apt:
+        name: "{{ packages }}"
+        state: absent
+      vars:
+        packages:
+          - isc-dhcp-client
+          - isc-dhcp-common
+          - nullmailer
+          - linuxlogo
+          - unattended-upgrades
+          - memtest86+

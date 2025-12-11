@@ -1,0 +1,5 @@
+[Match]
+Name=lan1
+
+[Network]
+DHCP=ipv4

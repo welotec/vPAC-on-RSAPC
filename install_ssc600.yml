@@ -1,0 +1,43 @@
+---
+
+- hosts: all
+  become: true
+  #become_method: su
+  tasks:
+
+  - name: install SSC600
+    block:
+      - name: copy disk image to final destination
+        ansible.builtin.copy:
+          src: /root/virtual_products/ssc600_disk.img
+          dest: /var/lib/libvirt/images/ssc600.img
+          remote_src: yes
+      - name: copy ptp_status script into place
+        ansible.builtin.copy:
+          src: /root/virtual_products/ptp_status.sh
+          dest: /usr/sbin/ptp_status.sh
+          remote_src: yes
+          mode: '0755'
+      - name: copy ptp_service file into place
+        ansible.builtin.copy:
+          src: /root/virtual_products/ptp_status.service
+          dest: /etc/systemd/system/ptp_status.service
+          remote_src: yes
+      - name: create ptp dir for ptp_status service
+        ansible.builtin.file:
+          path: /var/lib/libvirt/images/ptp
+          state: directory
+      - name: start ptp_status service
+        ansible.builtin.service:
+          name: ptp_status
+          state: started
+          enabled: yes
+      - name: Define a VM
+        community.libvirt.virt:
+          command: define
+          xml: "{{ lookup('template', 'templates/ssc600-deb.xml') }}"
+          autostart: true
+      - name: start vm
+        community.libvirt.virt:
+          name: ssc600
+          state: running

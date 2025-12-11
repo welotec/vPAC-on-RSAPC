@@ -1,0 +1,10 @@
+[Match]
+Driver=igb
+PermanentMACAddress=70:f8:e7*
+
+[Link]
+NamePolicy=
+AlternativeNamesPolicy=
+Name=lanPRP
+AlternativeName=process_bus
+AlternativeName=lan_ptp

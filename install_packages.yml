@@ -1,0 +1,63 @@
+---
+
+- hosts: all
+  become: true
+  tasks:
+
+    - name: ensure a list of packages installed
+      ansible.builtin.yum:
+        name: "{{ packages }}"
+      vars:
+        packages:
+        - msr-tools
+        - cabextract
+        - linux-firmware
+        - microcode_ctl
+        - at
+        - audispd-plugins
+        - audit
+        - bridge-utils
+        - ca-certificates
+        - chrony
+        - curl
+        - pcp-system-tools
+        - gnupg
+        - hddtemp
+        - irqbalance
+        - jq
+        - lbzip2
+        - linuxptp
+        - net-tools
+        - openssh-server
+        - edk2-ovmf
+        - python3-dnf
+        - python3-cffi
+        - python3-setuptools
+        - sudo
+        - sysfsutils
+        - syslog-ng
+        - sysstat
+        - vim
+        - wget
+        - rsync
+        - pciutils
+        - conntrack-tools
+        - busybox
+        - nginx
+        - ntfs-3g
+        - python3-flask-wtf
+        - corosync
+        - kernel-rt
+        - grubby
+        - kernel-rt-kvm
+        - qemu-kvm
+        - libvirt
+        - libvirt-daemon
+        - tuna
+        - tuned
+        - tuned-profiles-nfv
+        - tuned-profiles-realtime
+        - virt-install
+        - systemd-networkd
+        - systemd-resolved
+        - systemd-timesyncd

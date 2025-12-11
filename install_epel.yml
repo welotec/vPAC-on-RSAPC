@@ -1,0 +1,23 @@
+---
+
+- hosts: all
+  become: true
+  tasks:
+
+  - name: install EPEL
+    block:
+      - name: activate rt
+        ansible.builtin.shell: subscription-manager repos --enable=rhel-9-for-x86_64-rt-rpms
+      - name: activate nfv
+        ansible.builtin.shell: subscription-manager repos --enable=rhel-9-for-x86_64-nfv-rpms
+      - name: activate repo
+        ansible.builtin.shell: subscription-manager repos --enable codeready-builder-for-rhel-9-$(arch)-rpms
+      #- name: Enable CodeReady Builder (CRB) repository on RHEL
+      #  ansible.builtin.command:
+      #    cmd: dnf config-manager --set-enabled crb
+      #  register: crb_status
+      #  changed_when: "'already enabled' not in crb_status.stdout"
+      #- name: enable codeready builder
+      #  ansible.builtin.shell: /usr/bin/crb enable
+      - name: install the thing
+        ansible.builtin.shell: dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm

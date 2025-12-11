@@ -1,0 +1,11 @@
+[Unit]
+Description=Affine irqs and corresponding kthread pids to CPU 3 - sleep is required because I couldn't figure out the correct dependencies
+Requires=network-online.target
+Wants=network-online.target   
+[Service]
+ExecStart=bash -c "sleep 1m && /usr/local/sbin/nic_setup.sh"
+#ExecStart=/usr/local/sbin/nic_setup.sh
+Type=oneshot
+[Install]
+WantedBy=multi-user.target
+

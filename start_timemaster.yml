@@ -1,0 +1,17 @@
+---
+
+- hosts: all
+  become: true
+  tasks:
+
+  - name: start timemaster
+    block:
+      - name: copy timemaster.conf
+        ansible.builtin.copy:
+          src: templates/timemaster.conf
+          dest: /etc/timemaster.conf
+      - name: start timemaster service
+        ansible.builtin.service:
+          name: timemaster
+          state: started
+          enabled: yes

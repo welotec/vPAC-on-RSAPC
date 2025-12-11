@@ -1,0 +1,11 @@
+[Match]
+Driver=igc
+PermanentMACAddress={{ mac }}
+
+[Link]
+NamePolicy=
+AlternativeNamesPolicy=
+Name=lan{{ number }}
+{% if alt_name %}
+AlternativeName={{ alt_name }}
+{% endif %}

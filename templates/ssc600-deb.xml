@@ -1,0 +1,111 @@
+<domain type="kvm">
+  <name>ssc600</name>
+  <memory unit="GiB">8</memory>
+  <currentMemory unit="GiB">8</currentMemory>
+  <memoryBacking>
+    <hugepages/>
+    <nosharepages/>
+    <locked/>
+    <!--
+    <source type='memfd'/>
+    <access mode='shared'/>
+    -->
+  </memoryBacking>
+  <vcpu placement="static">4</vcpu>
+  <cputune>
+    <vcpupin vcpu="0" cpuset="7"/>
+    <vcpupin vcpu="1" cpuset="6"/>
+    <vcpupin vcpu="2" cpuset="5"/>
+    <vcpupin vcpu="3" cpuset="4"/>
+    <emulatorpin cpuset="3"/>
+    <vcpusched vcpus="0" scheduler="fifo" priority="50"/>
+    <vcpusched vcpus="1" scheduler="fifo" priority="50"/>
+    <vcpusched vcpus="2" scheduler="fifo" priority="50"/>
+    <vcpusched vcpus="3" scheduler="fifo" priority="50"/>
+  </cputune>
+  <os>
+    <type arch="x86_64" machine="q35">hvm</type>
+    <boot dev="hd"/>
+  </os>
+  <features>
+    <acpi/>
+    <apic eoi="on"/>
+    <kvm>
+      <hint-dedicated state="on"/>
+      <poll-control state="off"/>
+      <pv-ipi state="on"/>
+    </kvm>
+    <pmu state="off"/>
+    <vmport state="off"/>
+  </features>
+  <cpu mode="host-passthrough" check="none">
+    <topology sockets="1" cores="4" threads="1"/>
+    <cache mode="passthrough"/>
+  </cpu>
+  <clock offset="utc">
+    <timer name="rtc" tickpolicy="catchup"/>
+    <timer name="pit" tickpolicy="delay"/>
+    <timer name="hpet" present="no"/>
+  </clock>
+  <on_poweroff>destroy</on_poweroff>
+  <on_reboot>restart</on_reboot>
+  <on_crash>destroy</on_crash>
+  <pm>
+    <suspend-to-mem enabled="no"/>
+    <suspend-to-disk enabled="no"/>
+  </pm>
+  <devices>
+    <disk type="file" device="disk">
+      <driver name="qemu" type="raw" cache="none" io="threads"/>
+      <source file="/var/lib/libvirt/images/ssc600.img"/>
+      <target dev="vda" bus="virtio"/>
+      <address type="pci" domain="0x0000" bus="0x00" slot="0x05" function="0x0"/>
+    </disk>
+    <controller type="usb" index="0" model="none"/>
+    <controller type="pci" index="0" model="pcie-root"/>
+    <controller type="virtio-serial" index="0">
+      <address type="pci" domain="0x0000" bus="0x00" slot="0x06" function="0x0"/>
+    </controller>
+    <filesystem type="mount" accessmode="mapped" readonly="1">
+      <driver type="path" wrpolicy="immediate"/>
+      <source dir="/var/lib/libvirt/images/ptp"/>
+      <target dir="ptp"/>
+      <address type="pci" domain="0x0000" bus="0x00" slot="0x04" function="0x0"/>
+    </filesystem>
+    <!--
+    <filesystem type="mount" accessmode="passthrough">
+      <driver type="virtiofs"/>
+      <source dir="/var/lib/libvirt/images/ptp"/>
+      <target dir="ptp"/>
+    </filesystem>
+    -->
+
+    <interface type="bridge">
+      <mac/>
+      <source bridge="mgmt-bridge"/>
+      <model type="virtio"/>
+      <address type="pci" domain="0x0000" bus="0x00" slot="0x02" function="0x0"/>
+    </interface>
+    <interface type="direct" trustGuestRxFilters="yes">
+      <mac/>
+      <source dev="process_bus" mode="bridge"/>
+      <model type="virtio"/>
+      <address type="pci" domain="0x0000" bus="0x00" slot="0x03" function="0x0"/>
+    </interface>
+    <interface type="direct" trustGuestRxFilters="yes">
+      <mac/>
+      <source dev="lan5" mode="bridge"/>
+      <model type="virtio"/>
+      <address type="pci" domain="0x0000" bus="0x00" slot="0x07" function="0x0"/>
+    </interface>
+    <console type="pty">
+      <target type="virtio" port="0"/>
+    </console>
+    <input type="mouse" bus="ps2"/>
+    <input type="keyboard" bus="ps2"/>
+    <watchdog model="i6300esb" action="reset">
+      <address type="pci" domain="0x0000" bus="0x00" slot="0x08" function="0x0"/>
+    </watchdog>
+    <memballoon model="none"/>
+  </devices>
+</domain>

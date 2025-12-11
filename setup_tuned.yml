@@ -1,0 +1,49 @@
+---
+- hosts: all
+  become: true
+  tasks:
+
+    - name: create etc/tuned dir if not present
+      ansible.builtin.file:
+        path: /etc/tuned/profiles/welo-rt
+        state: directory
+
+    - name: deploy tuned.conf
+      ansible.builtin.copy:
+        src: templates/tuned.conf
+        dest: /etc/tuned/profiles/welo-rt/tuned.conf
+
+    - name: deploy cpu_setup service
+      tags: cpu_setup
+      block:
+        - name: deploy script
+          ansible.builtin.copy:
+            src: templates/cpu_setup.sh
+            dest: /usr/local/sbin/cpu_setup.sh
+            mode: '0755'
+        - name: depoly service
+          ansible.builtin.copy:
+            src: templates/cpu_setup.service
+            dest: /etc/systemd/system/cpu_setup.service
+
+    - name: deploy nic_setup service
+      tags: nic_setup
+      block:
+        - name: deploy script
+          ansible.builtin.copy:
+            src: templates/nic_setup.sh
+            dest: /usr/local/sbin/nic_setup.sh
+            mode: '0755'
+        - name: depoly service
+          ansible.builtin.copy:
+            src: templates/nic_setup.service
+            dest: /etc/systemd/system/nic_setup.service
+
+    #- name: change to rt kernel as default boot
+    #  ansible.builtin.command: grubby --set-default-index 0
+
+    #- name: disable SELINUX
+    #  ansible.builtin.shell: echo "SELINUX=disabled" > /etc/selinux/config
+
+    - name: activate tuned profile
+      ansible.builtin.command: tuned-adm profile welo-rt

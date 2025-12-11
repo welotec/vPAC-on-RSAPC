@@ -1,0 +1,17 @@
+---
+
+- hosts: all
+  tasks:
+
+  - name: Retrieve MAC addresses
+    ansible.builtin.script: ./get_macs.sh
+    register: mac_addresses
+
+  - name: Convert MAC addresses to an array
+    set_fact:
+      mac_array: "{{ mac_addresses.stdout_lines }}"
+
+  - name: Display the MAC addresses
+    debug:
+      #msg: "{{ mac_array }}"
+      var: mac_array

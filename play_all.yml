@@ -1,0 +1,21 @@
+---
+- hosts: all
+  tasks:
+- name: packages
+  ansible.builtin.import_playbook: install_packages_deb.yml
+- name: reboot
+  ansible.builtin.import_playbook: reboot.yml
+- name: download ssc600
+  ansible.builtin.import_playbook: download_ssc600.yml
+- name: timemaster
+  ansible.builtin.import_playbook: start_timemaster.yml
+- name: tuned
+  ansible.builtin.import_playbook: setup_tuned.yml
+- name: interfaces
+  ansible.builtin.import_playbook: assign_interfaces.yml
+- name: systemd-networkd
+  ansible.builtin.import_playbook: switch_NM_to_systemd-networkd.yml
+- name: reboot
+  ansible.builtin.import_playbook: reboot.yml
+- name: install ssc600
+  ansible.builtin.import_playbook: install_ssc600.yml

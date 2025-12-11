@@ -1,0 +1,33 @@
+---
+
+- hosts: all
+  become: true
+  tasks:
+
+  - name: Switch NetworkManager to systemd-networkd
+    block:
+      - name: disable NM
+        ansible.builtin.service:
+          name: NetworkManager
+          enabled: false
+          state: stopped
+      - name: enable systemd-networkd
+        ansible.builtin.service:
+          name: systemd-networkd
+          enabled: true
+      - name: enable systemd-resolved
+        ansible.builtin.service:
+          name: systemd-resolved
+          state: started
+          enabled: true
+      - name: remote /etc/resolv.conf
+        ansible.builtin.file:
+          path: /etc/resolv.conf
+          state: absent
+      - name: link resolv file
+        ansible.builtin.file:
+          src: /run/systemd/resolve/resolv.conf
+          dest: /etc/resolv.conf
+          owner: root
+          group: root
+          state: link

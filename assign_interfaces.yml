@@ -1,0 +1,78 @@
+---
+- hosts: all
+  become: true
+  tasks:
+
+  - name: Retrieve MAC addresses of onboard NICs
+    ansible.builtin.script: ./get_macs.sh
+    register: mac_addresses
+
+  - name: Convert MAC addresses to an array
+    set_fact:
+      mac_array: "{{ mac_addresses.stdout_lines }}"
+
+  - name: Retrieve MAC address for lan_mgmt
+    ansible.builtin.shell: ip link show lan_mgmt | grep link/ether | awk '{print $2}'
+    register: lan_mgmt_mac
+    ignore_errors: true
+
+  - name: Retrieve MAC address for lan_ptp
+    ansible.builtin.shell: ip link show lan_ptp | grep link/ether | awk '{print $2}'
+    register: lan_ptp_mac
+    ignore_errors: true
+
+  - name: Determine altname assignments
+    set_fact:
+      lan_mgmt_name: "{{ 'lan_mgmt' if lan_mgmt_mac.rc == 0 else '' }}"
+      lan_ptp_name: "{{ 'lan_ptp' if lan_ptp_mac.rc == 0 else '' }}"
+
+  - name: Creates directory
+    ansible.builtin.file:
+      path: /etc/systemd/network
+      state: directory
+
+  - name: Deploy systemd-networkd interface files for onboard NICs
+    ansible.builtin.template:
+      src: templates/20-lanX.link.j2
+      dest: /etc/systemd/network/20-lan{{ item + 1 }}.link
+    loop: "{{ range(0, 8) | list }}"
+    vars:
+      number: "{{ item }}"
+      mac: "{{ mac_array[item] }}"
+  #    alt_name: >-
+  #      {% if item == 0%}
+  #      lan_mgmt
+  #      {% endif %}
+  #      {% if item == 2%}
+  #      lan_ptp
+  #      {% endif %}
+
+  - name: Deploy management bridge config
+    ansible.builtin.template:
+      src: templates/79-mgmtbridge.network
+      dest: /etc/systemd/network/79-mgmtbridge.network
+
+  - name: Deploy management bridge netdev
+    ansible.builtin.copy:
+      src: templates/79-mgmtbridge.netdev
+      dest: /etc/systemd/network/79-mgmtbridge.netdev
+
+  - name: Deploy management bridge interface config
+    ansible.builtin.copy:
+      src: templates/80-mgmtbridge-interface.network
+      dest: /etc/systemd/network/80-mgmtbridge-interface.network
+
+  - name: Deploy systemd-netword network DHCP config
+    ansible.builtin.copy:
+      src: templates/10-dhcp.network
+      dest: /etc/systemd/network/98-dhcp.network
+
+  - name: Deploy systemd-networkd interface files for PRP card
+    ansible.builtin.copy:
+      src: templates/20-prp-card.link
+      dest: /etc/systemd/network/20-prp-card.link
+
+  # Step 6: Verify changes before restart (skipped for now)
+  # - name: Reload systemd-networkd
+  #   command: systemctl restart systemd-networkd
+

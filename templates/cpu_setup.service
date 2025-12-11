@@ -1,0 +1,10 @@
+[Unit]
+Description=setup Welotec RSAPC MK2 for optimal rt performance
+Before=libvirt-guest.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/cpu_setup.sh
+
+[Install]
+WantedBy=multi-user.target

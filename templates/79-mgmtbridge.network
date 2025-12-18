@@ -4,8 +4,8 @@
 Name=mgmt-bridge
 
 [Network]
-Gateway=192.168.130.254
+Gateway={{ gateway }}
 Address={{ ansible_host }}/24
-Address=192.168.2.230/24
-DNS=192.168.130.254
+Address=192.168.2.230/24 # this is the default subnet for the SSC600 (192.168.2.10/24)
+DNS={{ dns_address | default('8.8.8.8') }}
 

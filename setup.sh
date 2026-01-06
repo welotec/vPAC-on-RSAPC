@@ -38,6 +38,6 @@ ansible-playbook -l localhost assigne_interfaces.yml
 ansible-playbook -l localhost switch_NM_to_systemd-networkd.yml
 ansible-playbook -l localhost download_ssc600.yml
 echo "reboot the machine and run the following two commands:"
-echo "ansible-playbook -l localhost download_ssc600.yml"
+echo "ansible-playbook -l localhost download_ssc600.yml -e\"ssc600_downloadlink=<your downloadlink>\""
 echo "ansible-playbook -l localhost install_ssc600.yml"
 

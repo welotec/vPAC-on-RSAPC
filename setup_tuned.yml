@@ -5,13 +5,13 @@
 
     - name: create etc/tuned dir if not present
       ansible.builtin.file:
-        path: /etc/tuned/profiles/welo-rt
+        path: /etc/tuned/welo-rt
         state: directory
 
     - name: deploy tuned.conf
       ansible.builtin.copy:
         src: templates/tuned.conf
-        dest: /etc/tuned/profiles/welo-rt/tuned.conf
+        dest: /etc/tuned/welo-rt/tuned.conf
 
     - name: deploy cpu_setup service
       tags: cpu_setup
@@ -44,6 +44,12 @@
 
     #- name: disable SELINUX
     #  ansible.builtin.shell: echo "SELINUX=disabled" > /etc/selinux/config
+
+    - name: enable tuned
+      ansible.builtin.service:
+        name: tuned
+        state: started
+        enabled: yes
 
     - name: activate tuned profile
       ansible.builtin.command: tuned-adm profile welo-rt

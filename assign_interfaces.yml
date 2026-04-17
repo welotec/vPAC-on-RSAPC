@@ -35,7 +35,7 @@
     ansible.builtin.template:
       src: templates/20-lanX.link.j2
       dest: /etc/systemd/network/20-lan{{ item + 1 }}.link
-    loop: "{{ range(0, 8) | list }}"
+    loop: "{{ range(0, 7) | list }}"
     vars:
       number: "{{ item }}"
       mac: "{{ mac_array[item] }}"

@@ -1,9 +1,9 @@
 # vPAC on RSAPC 
 ## this is a repository showcasing fine tuning of the RSAPC MK2 platform for realtime applications.
 
-[!NOTE]
-This repository is still new and under construction - there might be errors
-ahead. Please reach out if you find any.
+> [!NOTE]
+> This repository is still new and under construction - there might be errors
+> ahead. Please reach out if you find any.
 
 This repo was prepared to set up the SSC600 SW by ABB as it was the first
 commercially available vPAC solution that we could get our hands on. Some of the

@@ -5,13 +5,13 @@
 
     - name: create etc/tuned dir if not present
       ansible.builtin.file:
-        path: /etc/tuned/welo-rt
+        path: /etc/tuned/profiles/welo-rt
         state: directory
 
     - name: deploy tuned.conf
       ansible.builtin.copy:
         src: templates/tuned.conf
-        dest: /etc/tuned/welo-rt/tuned.conf
+        dest: /etc/tuned/profiles/welo-rt/tuned.conf
 
     - name: deploy cpu_setup service
       tags: cpu_setup

@@ -13,6 +13,11 @@
         src: templates/tuned.conf
         dest: /etc/tuned/profiles/welo-rt/tuned.conf
 
+    - name: deploy irqbalance modifier script
+      ansible.builtin.copy:
+        src: templates/irqbalance_modifier.sh
+        dest: /etc/tuned/profiles/welo-rt/irqbalance_modifier.sh
+
     - name: deploy cpu_setup service
       tags: cpu_setup
       block:

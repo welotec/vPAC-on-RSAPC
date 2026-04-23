@@ -1,0 +1,72 @@
+#!/bin/bash
+set -euo pipefail
+
+# TODO: do proper error checking and check if files are present
+
+{% set cos_masks       = cos_masks       | default(["0xc00", "0x300", "0x0f0", "0x00f"]) %}
+{% set cos_assignments = cos_assignments | default([
+    {"cos": 1, "cores": [1]},
+    {"cos": 2, "cores": [4, 5]},
+    {"cos": 3, "cores": [2, 3, 6, 7, 10]}
+]) %}
+{% set gpu_mask      = gpu_mask      | default("0xe00") %}
+{% set wrc_mask      = wrc_mask      | default("0xe00") %}
+{% set rt_freq       = rt_freq       | default(2400000) %}
+{% set non_rt_freq   = non_rt_freq   | default(1500000) %}
+{% set non_rt_cores  = non_rt_cores  | default([0, 1, 2]) %}
+{% set rt_cores      = rt_cores      | default([3, 4, 5, 6, 7]) %}
+{% set offline_cores = offline_cores | default([8, 9, 10, 11, 12, 13, 14, 15]) %}
+
+# setup Cache-Way masks for COS 0-{{ cos_masks | length - 1 }}
+{% for mask in cos_masks %}
+wrmsr {{ "0x%x" % (0xc90 + loop.index0) }} {{ mask }}
+{% endfor %}
+
+# cores 0 and 8 remain in default COS 0
+{% for assignment in cos_assignments %}
+# set core {{ assignment.cores | join(',') }} to use COS {{ assignment.cos }}
+{% for core in assignment.cores %}
+wrmsr -p {{ core }} 0xc8f {{ "0x%x00000000" % assignment.cos }}
+{% endfor %}
+{% endfor %}
+
+# set GPU mask to {{ gpu_mask }}
+{% for i in range(cos_masks | length) %}
+wrmsr {{ "0x%x" % (0x18b0 + i) }} {{ gpu_mask }}
+{% endfor %}
+
+# set WRC mask to {{ wrc_mask }}
+{% for i in range(cos_masks | length) %}
+wrmsr {{ "0x%x" % (0x18d0 + i) }} {{ wrc_mask }}
+{% endfor %}
+
+rt_freq={{ rt_freq }}
+non_rt_freq={{ non_rt_freq }}
+
+# setting max limit for non-rt cores.
+# can still clock lower depending on load and pstate settings
+{% for core in non_rt_cores %}
+echo $non_rt_freq > /sys/devices/system/cpu/cpu{{ core }}/cpufreq/scaling_max_freq
+{% endfor %}
+
+# pinning both upper and lower bounds of pstate scaling to the same frequency
+# for all the rt cores, which makes the frequency static.
+{% for core in rt_cores %}
+echo $rt_freq > /sys/devices/system/cpu/cpu{{ core }}/cpufreq/scaling_max_freq
+{% endfor %}
+
+{% for core in rt_cores %}
+echo $rt_freq > /sys/devices/system/cpu/cpu{{ core }}/cpufreq/scaling_min_freq
+{% endfor %}
+
+# this effectively puts the core into polling mode (idle.poll) thereby keeping it in C0
+{% for core in rt_cores %}
+echo "n/a" > /sys/devices/system/cpu/cpu{{ core }}/power/pm_qos_resume_latency_us
+{% endfor %}
+
+# take sibling cores offline (effectively disabling HT)
+{% for core in offline_cores %}
+if [ -f /sys/devices/system/cpu/cpu{{ core }}/online ]; then
+    until echo 0 > /sys/devices/system/cpu/cpu{{ core }}/online; do :; done
+fi
+{% endfor %}

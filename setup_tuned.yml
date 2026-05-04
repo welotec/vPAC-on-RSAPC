@@ -1,6 +1,9 @@
 ---
 - hosts: all
   become: true
+  vars:
+    rt_cores: [3, 4, 5, 6, 7]
+    non_rt_cores: [0, 1, 2]
   tasks:
 
     - name: create etc/tuned dir if not present
@@ -22,8 +25,8 @@
       tags: cpu_setup
       block:
         - name: deploy script
-          ansible.builtin.copy:
-            src: templates/cpu_setup.sh
+          ansible.builtin.template:
+            src: templates/cpu_setup.sh.j2
             dest: /usr/local/sbin/cpu_setup.sh
             mode: '0755'
         - name: depoly service
